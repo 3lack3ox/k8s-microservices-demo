@@ -34,7 +34,7 @@ services:
       - CART_SERVICE_ADDR=cartservice:7070
       - CURRENCY_SERVICE_ADDR=currencyservice:7000
       - EMAIL_SERVICE_ADDR=emailservice:6000
-      - PAYMENT_SERVICE_ADDR=paymentservice:3000
+      - PAYMENT_SERVICE_ADDR=paymentservice:3002
     depends_on:
       - shippingservice
       - productcatalogservice
