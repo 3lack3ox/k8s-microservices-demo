@@ -1,0 +1,129 @@
+services:
+  adservice:
+    image: 3lack3ox/adservice:v1
+    container_name: adservice
+    ports:
+      - "9555:9555"
+
+  cartservice:
+    image: 3lack3ox/cartservice:v1
+    container_name: cartservice
+    ports:
+      - "7070:7070"
+    environment:
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports: 
+      - "6379:6379"
+    volumes:
+    - redis_data:/data   
+
+  checkoutservice:
+    image: 3lack3ox/checkoutservice:v1
+    container_name: checkoutservice
+    ports:
+      - "5050:5050"
+    environment:
+      - SHIPPING_SERVICE_ADDR=shippingservice:50051
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+      - CART_SERVICE_ADDR=cartservice:7070
+      - CURRENCY_SERVICE_ADDR=currencyservice:7000
+      - EMAIL_SERVICE_ADDR=emailservice:6000
+      - PAYMENT_SERVICE_ADDR=paymentservice:3000
+    depends_on:
+      - shippingservice
+      - productcatalogservice
+      - cartservice
+      - currencyservice
+      - emailservice
+      - paymentservice
+
+  currencyservice:
+    image: 3lack3ox/currencyservice:v1
+    container_name: currencyservice
+    ports:
+      - "7000:7000"
+    environment:
+      - DISABLE_PROFILER=true
+
+  emailservice:
+    image: 3lack3ox/emailservice:v1
+    container_name: emailservice
+    ports:
+      - "6000:6000"      
+
+  frontend:
+    image: 3lack3ox/frontend:v1
+    container_name: frontend
+    ports:
+      - "3000:3000"   
+    environment:
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+      - CURRENCY_SERVICE_ADDR=currencyservice:7000
+      - CART_SERVICE_ADDR=cartservice:7070
+      - RECOMMENDATION_SERVICE_ADDR=recommendationservice:8080
+      - CHECKOUT_SERVICE_ADDR=checkoutservice:5050
+      - SHIPPING_SERVICE_ADDR=shippingservice:50051
+      - AD_SERVICE_ADDR=adservice:9555
+      - SHOPPING_ASSISTANT_SERVICE_ADDR=shoppingassistantservice:8081
+    depends_on:
+      - productcatalogservice
+      - currencyservice
+      - cartservice
+      - recommendationservice
+      - checkoutservice
+      - shippingservice
+      - adservice
+      - shoppingassistantservice  
+
+  paymentservice:
+    image: 3lack3ox/paymentservice:v1
+    container_name: paymentservice
+    ports:
+      - "3002:3002"   
+    environment:
+      - PORT=3002
+      - DISABLE_PROFILER=true
+
+  productcatalogservice:
+    image: 3lack3ox/productcatalogservice:v1
+    container_name: productcatalogservice
+    ports:
+      - "3550:3550"   
+
+  recommendationservice:
+    image: 3lack3ox/recommendationservice:v1
+    container_name: recommendationservice
+    ports:
+      - "8080:8080"   
+    environment:
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+
+  shippingservice:
+    image: 3lack3ox/shippingservice:v1
+    container_name: shippingservice
+    ports:
+      - "50051:50051"                                 
+  
+  shoppingassistantservice:
+    image: 3lack3ox/shoppingassistantservice:v1
+    container_name: shoppingassistantservice
+    ports:
+      - "8081:8081"  
+    environment:
+      - PROJECT_ID=online-boutique-dev
+      - REGION=us-central1
+      - ALLOYDB_DATABASE_NAME=products_db
+      - ALLOYDB_TABLE_NAME=product_vectors
+      - ALLOYDB_CLUSTER_NAME=shopping-cluster
+      - ALLOYDB_INSTANCE_NAME=shopping-instance
+      - ALLOYDB_SECRET_NAME=db-password
+
+volumes:
+  redis_data:
+         

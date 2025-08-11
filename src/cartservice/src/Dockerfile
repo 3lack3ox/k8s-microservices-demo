@@ -1,13 +1,9 @@
-# Stage 1 - Build Stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
-
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0.101-noble@sha256:1f13e67d295e02abdfd187c341f887442bad611eda536766172ced401fc8b9fa AS builder
 ARG TARGETARCH
-WORKDIR /src
-    
-COPY cartservice.csproj ./
-RUN dotnet restore cartservice.csproj \ 
+WORKDIR /app
+COPY cartservice.csproj .
+RUN dotnet restore cartservice.csproj \
     -a $TARGETARCH
-   
 COPY . .
 RUN dotnet publish cartservice.csproj \
     -p:PublishSingleFile=true \
@@ -15,20 +11,19 @@ RUN dotnet publish cartservice.csproj \
     --self-contained true \
     -p:PublishTrimmed=true \
     -p:TrimMode=full \
-    -c Release \
+    -c release \
     -o /cartservice
-    
-# Stage 2 - Runtime Stage
-FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-chiseled
-    
+
+# https://mcr.microsoft.com/product/dotnet/runtime-deps
+FROM mcr.microsoft.com/dotnet/runtime-deps:9.0.1 AS runtime
+
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y zlib1g && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /cartservice .
-    
 EXPOSE 7070
-    
 ENV DOTNET_EnableDiagnostics=0 \
     ASPNETCORE_HTTP_PORTS=7070
-    
 USER 1000
 ENTRYPOINT ["/app/cartservice"]
-    
