@@ -18,6 +18,8 @@ WORKDIR /app
 
 COPY --from=builder /app/productcatalogservice . 
 
+COPY --from=builder /app/products.json .
+
 EXPOSE 3550
 
 CMD ["./productcatalogservice"]

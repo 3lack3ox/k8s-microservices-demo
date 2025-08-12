@@ -18,6 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app/frontend .
 COPY --from=builder /app/templates ./templates    
+COPY --from=builder /app/static ./static 
 
 EXPOSE 3000
 

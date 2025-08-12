@@ -47,8 +47,9 @@ services:
     image: 3lack3ox/currencyservice:v1
     container_name: currencyservice
     ports:
-      - "7000:7000"
+      - "7001:7000"
     environment:
+      - PORT=7000
       - DISABLE_PROFILER=true
 
   emailservice:
@@ -116,13 +117,14 @@ services:
     ports:
       - "8081:8081"  
     environment:
-      - PROJECT_ID=online-boutique-dev
-      - REGION=us-central1
-      - ALLOYDB_DATABASE_NAME=products_db
-      - ALLOYDB_TABLE_NAME=product_vectors
-      - ALLOYDB_CLUSTER_NAME=shopping-cluster
-      - ALLOYDB_INSTANCE_NAME=shopping-instance
-      - ALLOYDB_SECRET_NAME=db-password
+      - DISABLE_PROFILER=true
+      - PROJECT_ID=dummy-project-id
+      - REGION=dummy-region
+      - ALLOYDB_DATABASE_NAME=dummy-database-name
+      - ALLOYDB_TABLE_NAME=dummy-table-name
+      - ALLOYDB_CLUSTER_NAME=dummy-cluster-name
+      - ALLOYDB_INSTANCE_NAME=dummy-instance-name
+      - ALLOYDB_SECRET_NAME=dummy-secret-name
 
 volumes:
   redis_data:

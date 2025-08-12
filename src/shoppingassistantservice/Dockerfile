@@ -6,7 +6,10 @@ WORKDIR /app
 RUN apk add --no-cache gcc musl-dev libffi-dev g++ make linux-headers
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt \
+    && pip install --no-cache-dir --prefix=/install protobuf==3.20.3 \
+    && pip install --no-cache-dir --prefix=/install langgraph
+
 
 # Stage 2 - Runtime
 FROM python:3.12-alpine
